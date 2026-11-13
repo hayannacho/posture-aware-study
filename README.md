@@ -2,7 +2,7 @@
 
 **A webcam application for exploring immediate versus adaptive sitting-posture feedback.**
 
-MediaPipe pose estimation, personal calibration, visual monitoring and optional audio cues come together in a local Flask application. Developed for Georgia Tech's Health Sensing and Interventions course by **Anna Cho and Amey Agarwal**, with AI-assisted application development.
+MediaPipe pose estimation, personal calibration, visual monitoring and optional audio cues come together in a local Flask application. Developed for Georgia Tech's Health Sensing and Interventions course. AI tools were used to help write application code; see [code-development disclosure](AI_USAGE.md).
 
 ## Features and demo outputs
 
@@ -15,7 +15,7 @@ MediaPipe pose estimation, personal calibration, visual monitoring and optional 
 
 **Verified:** four hardware-free tests passed, covering baseline calibration, synthetic lighting, Flask registration/pages and temporary synthetic record creation. Live camera tracking, audio and 30-minute sessions have not been revalidated. [Validation details](docs/VALIDATION.md).
 
-**Study context:** the joint report describes a 13-person study with 30-minute sessions. No efficacy result is claimed from this data-free edition. This is a course research prototype, not a clinically validated system.
+**Study context:** the study report describes a 13-person study with 30-minute sessions. No efficacy result is claimed from this data-free edition. This is a course research prototype, not a clinically validated system.
 
 **Participant data excluded:** no original participant records, questionnaires, logs or recordings are published. Running the app can create new local records; see [data handling](docs/DATA_HANDLING.md).
 
@@ -47,13 +47,9 @@ python -m pip check
 
 The tests do not open a camera, play audio, or load participant data. They cover baseline behavior, synthetic lighting, Flask page/registration smoke checks, and temporary-directory record creation. Live tracking accuracy, audio hardware, and real-session behavior require separate manual verification.
 
-## My contribution — Anna Cho
+## Development and source
 
-I led the PostureAware project in collaboration with **Amey Agarwal**. I used AI tools to help generate application code. This portfolio therefore highlights my project leadership and AI-assisted development within a shared course project.
-
-The final report credits both Anna Cho and Amey Agarwal. My role statement reflects my account of the work; the archived Git commits are attributed to Amey and do not capture the full division of work. Individual module ownership and task-by-task percentages are not assigned in this edition.
-
-[Contribution context and team credit](docs/CONTRIBUTIONS.md) · [AI assistance disclosure](AI_USAGE.md) · [Original project](https://github.com/amey-agarwal/CorrectivePosture) · [Data handling](docs/DATA_HANDLING.md)
+The application integrates personal-baseline calibration, posture monitoring, feedback timing and local study-session records. AI tools were used to help generate application code. [Code-development disclosure](AI_USAGE.md) · [Source and changes](docs/PROVENANCE.md).
 
 ## Participant data excluded
 
@@ -75,10 +71,10 @@ docs/                  Contribution, provenance, data handling, validation
 
 Original setup scripts that repeatedly installed conflicting OpenCV packages are omitted. The old setup guide referenced `analyze_results.py` and `export_data.py`, which are absent from the supplied app snapshot; this edition does not advertise those commands or claim to reproduce the original study statistics.
 
-## Collaboration, source, and publication status
+## Source and licensing
 
-The upstream recorded in the archive is [amey-agarwal/CorrectivePosture](https://github.com/amey-agarwal/CorrectivePosture). The available history ends at `67a8a88`. This is a curated snapshot, not a preserved-history fork. Both collaborators must remain credited.
+The upstream recorded in the archive is [amey-agarwal/CorrectivePosture](https://github.com/amey-agarwal/CorrectivePosture). The available history ends at `67a8a88`. This is a curated snapshot, not a preserved-history fork. Source provenance is retained in the documentation.
 
-**No license file was found in the supplied app snapshot.** No new open-source license is assigned here. Confirm the intended publication/license terms with the collaborator before treating the shared code as licensed for redistribution. See [NOTICE.md](NOTICE.md).
+**No license file was found in the supplied app snapshot.** No new open-source license is assigned here. The repository does not grant additional redistribution rights. See [NOTICE.md](NOTICE.md).
 
-Portfolio preparation added these documents, dependency cleanup, hardware-free checks, and local server defaults: loopback-only binding, debug disabled, a runtime secret key, and default same-origin Socket.IO handling. These are preparation changes made with Codex assistance, not claims about Anna's original coursework implementation. [Source manifest and changes](docs/PROVENANCE.md).
+Portfolio preparation added these documents, dependency cleanup, hardware-free checks, and local server defaults: loopback-only binding, debug disabled, a runtime secret key, and default same-origin Socket.IO handling. These are publication-preparation changes, not claims about the original coursework implementation. [Source manifest and changes](docs/PROVENANCE.md).

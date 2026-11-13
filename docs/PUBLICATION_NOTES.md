@@ -1,13 +1,7 @@
-# Publication preparation
+# Publication notes
 
-Suggested name: `posture-aware-study`
+Public repository: https://github.com/hayannacho/posture-aware-study
 
-Suggested description:
+Description: Webcam posture-feedback application with personal calibration, immediate/adaptive cues and local session summaries. Original participant data excluded.
 
-> Webcam posture-feedback study led by Anna Cho in collaboration with Amey Agarwal; AI-assisted development, with participant data excluded.
-
-This edition is prepared for publication at https://github.com/hayannacho/posture-aware-study. Keep the original project link and both collaborators' credits.
-
-The README reflects Anna's account that she led the project in collaboration with Amey Agarwal, with AI-assisted code generation. Individual module/task ownership is not inferred. Both collaborators are credited. No LICENSE file was present in the supplied app snapshot, so the intended permission/license terms for public distribution remain to be confirmed with the collaborator.
-
-No raw study data, report outputs, original Git history, or real-person screenshots belong in this package. If new study sessions are run locally, recheck the exact upload selection; do not upload the entire working directory without reviewing it.
+The README focuses on functionality and tested behavior. Application-code development used AI assistance, as recorded in AI_USAGE.md. Source provenance is retained; the supplied snapshot has no LICENSE file and this edition assigns no new license.
