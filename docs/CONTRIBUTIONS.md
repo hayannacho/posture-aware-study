@@ -1,7 +1,5 @@
-# Application scope and source
+# Project implementation
 
-PostureAware is a team course project integrating webcam pose estimation, baseline calibration, immediate/adaptive feedback and session-record handling. AI tools were used to help generate application code. Individual module ownership and task percentages are not assigned here.
+Team project — Health Sensing and Interventions. The application integrates webcam calibration, posture monitoring, feedback timing and session summaries. AI tools were used to help write application code; see [AI_USAGE.md](../AI_USAGE.md). Original participant data are excluded.
 
-The archived application origin is `https://github.com/amey-agarwal/CorrectivePosture.git`, with available history through `67a8a88`. This edition is a curated snapshot; it does not reconstruct original commit authorship or claim sole implementation.
-
-Documentation, dependencies, local server defaults and synthetic preparation checks were added during publication preparation. These are distinguished from the original coursework in [PROVENANCE.md](PROVENANCE.md).
+Technical changes and validation results are documented in the README and companion technical notes.
