@@ -1,26 +1,23 @@
 # PostureAware
 
-**A collaborative webcam-based study of immediate versus adaptive feedback for sitting posture.**
+**A webcam application for exploring immediate versus adaptive sitting-posture feedback.**
 
-PostureAware combines MediaPipe pose estimation, individual baseline calibration, a Flask web interface, audio cues, and session summaries. It was developed for Georgia Tech's Health Sensing and Interventions course by **Anna Cho and Amey Agarwal**.
+MediaPipe pose estimation, personal calibration, visual monitoring and optional audio cues come together in a local Flask application. Developed for Georgia Tech's Health Sensing and Interventions course by **Anna Cho and Amey Agarwal**, with AI-assisted application development.
 
-## My contribution — Anna Cho
+## Features and demo outputs
 
-I led the PostureAware project in collaboration with **Amey Agarwal**. I used AI tools to help generate application code. This portfolio therefore highlights my project leadership and AI-assisted development within a shared course project.
+| Step | What the application does |
+| --- | --- |
+| Calibrate | Check lighting and estimate a personal neutral-posture baseline |
+| Monitor | Track neck tilt, shoulder tilt and face proximity |
+| Give feedback | Use a 1-second poor-posture threshold for immediate feedback; adaptive feedback starts at 5 seconds and changes with correction latency |
+| Summarize | Produce session summaries and a post-session questionnaire |
 
-The final report credits both Anna Cho and Amey Agarwal. My role statement reflects my account of the work; the archived Git commits are attributed to Amey and do not capture the full division of work. Individual module ownership and task-by-task percentages are not assigned in this edition.
+**Verified:** four hardware-free tests passed, covering baseline calibration, synthetic lighting, Flask registration/pages and temporary synthetic record creation. Live camera tracking, audio and 30-minute sessions have not been revalidated. [Validation details](docs/VALIDATION.md).
 
-[Contribution context and team credit](docs/CONTRIBUTIONS.md) · [AI assistance disclosure](AI_USAGE.md) · [Original project](https://github.com/amey-agarwal/CorrectivePosture) · [Data handling](docs/DATA_HANDLING.md)
+**Study context:** the joint report describes a 13-person study with 30-minute sessions. No efficacy result is claimed from this data-free edition. This is a course research prototype, not a clinically validated system.
 
-## What the shared project does
-
-- Registers a local study session and assigns an immediate or adaptive condition.
-- Checks lighting and estimates a personal neutral-posture baseline.
-- Monitors neck tilt, shoulder tilt, and face proximity using a webcam.
-- Uses a 1-second poor-posture threshold for immediate feedback; adaptive feedback starts at 5 seconds and changes with correction latency.
-- Produces session summaries and collects a post-session questionnaire.
-
-The joint report describes a 13-person, between-subjects study with 30-minute sessions. That is historical report context, not a result independently reproduced from this data-free edition. The app is a course research prototype, not a clinically validated diagnostic or treatment system.
+**Participant data excluded:** no original participant records, questionnaires, logs or recordings are published. Running the app can create new local records; see [data handling](docs/DATA_HANDLING.md).
 
 ## Run locally
 
@@ -39,6 +36,24 @@ Open `http://127.0.0.1:5000` on the same computer. The camera and audio are atta
 **Audio is optional for installation, but required to evaluate the study's audible feedback.** Without PyAudio, the app runs silently with an explicit warning. See [SETUP.md](SETUP.md) for audio installation. Do not interpret a silent demo as a reproduction of the original intervention.
 
 The core application performs pose processing locally and writes records under `data/`. The monitor page loads Socket.IO JavaScript from a CDN, so this edition is not entirely offline. It is not configured to upload study records to an analytics service.
+
+## Checks
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
+python -m pip check
+```
+
+The tests do not open a camera, play audio, or load participant data. They cover baseline behavior, synthetic lighting, Flask page/registration smoke checks, and temporary-directory record creation. Live tracking accuracy, audio hardware, and real-session behavior require separate manual verification.
+
+## My contribution — Anna Cho
+
+I led the PostureAware project in collaboration with **Amey Agarwal**. I used AI tools to help generate application code. This portfolio therefore highlights my project leadership and AI-assisted development within a shared course project.
+
+The final report credits both Anna Cho and Amey Agarwal. My role statement reflects my account of the work; the archived Git commits are attributed to Amey and do not capture the full division of work. Individual module ownership and task-by-task percentages are not assigned in this edition.
+
+[Contribution context and team credit](docs/CONTRIBUTIONS.md) · [AI assistance disclosure](AI_USAGE.md) · [Original project](https://github.com/amey-agarwal/CorrectivePosture) · [Data handling](docs/DATA_HANDLING.md)
 
 ## Participant data excluded
 
@@ -59,16 +74,6 @@ docs/                  Contribution, provenance, data handling, validation
 ```
 
 Original setup scripts that repeatedly installed conflicting OpenCV packages are omitted. The old setup guide referenced `analyze_results.py` and `export_data.py`, which are absent from the supplied app snapshot; this edition does not advertise those commands or claim to reproduce the original study statistics.
-
-## Checks
-
-```bash
-python -m pip install -r requirements-dev.txt
-python -m pytest -q
-python -m pip check
-```
-
-The tests do not open a camera, play audio, or load participant data. They cover baseline behavior, synthetic lighting, Flask page/registration smoke checks, and temporary-directory record creation. Live tracking accuracy, audio hardware, and real-session behavior require separate manual verification.
 
 ## Collaboration, source, and publication status
 
