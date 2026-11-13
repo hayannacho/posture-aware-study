@@ -2,7 +2,7 @@
 
 **A webcam application for exploring immediate versus adaptive sitting-posture feedback.**
 
-MediaPipe pose estimation, personal calibration, visual monitoring and optional audio cues come together in a local Flask application. Developed for Georgia Tech's Health Sensing and Interventions course. AI tools were used to help write application code; see [code-development disclosure](AI_USAGE.md).
+MediaPipe pose estimation, personal calibration, visual monitoring and optional audio cues come together in a local Flask application. Developed as a team project for Georgia Tech's Health Sensing and Interventions course. AI tools were used to help write application code; see [code-development disclosure](AI_USAGE.md).
 
 ## Features and demo outputs
 
