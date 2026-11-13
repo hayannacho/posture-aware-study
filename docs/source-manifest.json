@@ -1,0 +1,56 @@
+{
+  "source_archive": "GATECH.zip",
+  "source_prefix": "GATECH/Summer2026/HSI/PostureStudy/",
+  "source_commit": "67a8a88",
+  "upstream": "https://github.com/amey-agarwal/CorrectivePosture",
+  "selected_files": [
+    {
+      "path": "app.py",
+      "source_sha256": "ac85e5bea0ce9a589492a1eb3a7addcf0ed24bd1b06508378e0d091bb8f98b67",
+      "prepared_sha256": "8b55becc9b68491904ae8077345fcfd48db8ac9843d896db06e850cfa9ffdbe6",
+      "modified": true
+    },
+    {
+      "path": "audio_alerts.py",
+      "source_sha256": "3fc0b2be9d725ca6a4ce15b4985625325d8a8214999d7f48cdf0d9db40fa461b",
+      "prepared_sha256": "3fc0b2be9d725ca6a4ce15b4985625325d8a8214999d7f48cdf0d9db40fa461b",
+      "modified": false
+    },
+    {
+      "path": "calibration.py",
+      "source_sha256": "b155723755621e6cc0adcd31df24b815af1f19fd8d7952b36bee12e298785d01",
+      "prepared_sha256": "b155723755621e6cc0adcd31df24b815af1f19fd8d7952b36bee12e298785d01",
+      "modified": false
+    },
+    {
+      "path": "templates/index.html",
+      "source_sha256": "782f4421691891a745b9e8d71b168e6f180f6c2c29cd45c19ba60e2d5b170775",
+      "prepared_sha256": "782f4421691891a745b9e8d71b168e6f180f6c2c29cd45c19ba60e2d5b170775",
+      "modified": false
+    },
+    {
+      "path": "templates/calibration.html",
+      "source_sha256": "00125cdf147ee7fc74825b6711eb7857462dd67750d362f4a8ef1ecc9986b083",
+      "prepared_sha256": "00125cdf147ee7fc74825b6711eb7857462dd67750d362f4a8ef1ecc9986b083",
+      "modified": false
+    },
+    {
+      "path": "templates/monitor.html",
+      "source_sha256": "0e000cb7986994cbff408d4da3983a17c319bca212bfd49543f73627e169515d",
+      "prepared_sha256": "0e000cb7986994cbff408d4da3983a17c319bca212bfd49543f73627e169515d",
+      "modified": false
+    },
+    {
+      "path": "templates/questionnaire.html",
+      "source_sha256": "ded093193469a7da2254c7b3840eb0b5ac5304c95c46912304d2c4d168f1184d",
+      "prepared_sha256": "ded093193469a7da2254c7b3840eb0b5ac5304c95c46912304d2c4d168f1184d",
+      "modified": false
+    },
+    {
+      "path": "templates/results.html",
+      "source_sha256": "35a3d9fc02d8eaca3e698072a7052b9cb35f4d54c3d5d6e059a125ab0251c0db",
+      "prepared_sha256": "35a3d9fc02d8eaca3e698072a7052b9cb35f4d54c3d5d6e059a125ab0251c0db",
+      "modified": false
+    }
+  ]
+}

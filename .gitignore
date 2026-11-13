@@ -1,0 +1,28 @@
+# Participant records and exports: never commit real study data.
+data/
+PP*/
+P[0-9]*/
+exports/
+recordings/
+*.csv
+*.json
+!docs/source-manifest.json
+*.zip
+*.mp4
+*.mov
+*.avi
+*.h5
+*.mat
+*.npy
+*.npz
+# Environments, credentials and caches
+.venv/
+venv/
+pyvenv/
+.env
+.env.*
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+*.log

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostureAware — Live Session</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+  :root{
+    --bg:#0d0f14; --surface:#161921; --surface2:#1e2230;
+    --border:#2a2f3e; --accent:#4f8ef7; --accent2:#7c5af5;
+    --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+    --text:#e8eaf0; --muted:#8892a4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;
+       height:100vh;display:grid;grid-template-rows:54px 1fr;overflow:hidden}
+
+  /* ── Header ──────────────────────────────────────────────── */
+  .hdr{background:var(--surface);border-bottom:1px solid var(--border);
+       display:flex;align-items:center;padding:0 18px;gap:14px;z-index:10}
+  .hdr-logo{font-size:17px;font-weight:700}
+  .hdr-pid{font-size:12px;color:var(--muted)}
+  .spacer{flex:1}
+  .timer{font-family:'Courier New',monospace;font-size:22px;font-weight:700;letter-spacing:2px}
+  .timer-lbl{font-size:11px;color:var(--muted)}
+  .end-btn{padding:7px 16px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);
+           border-radius:8px;color:var(--bad);font-size:13px;font-weight:600;cursor:pointer;
+           transition:all .15s}
+  .end-btn:hover{background:rgba(239,68,68,.2)}
+
+  /* ── Main layout ─────────────────────────────────────────── */
+  .main{display:grid;grid-template-columns:1fr 310px;overflow:hidden}
+
+  /* ── Camera panel ────────────────────────────────────────── */
+  .cam{position:relative;background:#000;display:flex;align-items:center;
+       justify-content:center;overflow:hidden}
+
+  /* cam-feed: visible by default; hidden class collapses it */
+  .cam-feed{width:100%;height:100%;object-fit:cover;transition:opacity .3s}
+  .cam-feed.hidden{opacity:0;pointer-events:none}
+
+  /* Video toggle button */
+  .video-toggle-btn{
+    position:absolute;top:14px;right:14px;z-index:6;
+    padding:7px 13px;background:rgba(22,25,33,.80);
+    border:1px solid var(--border);border-radius:9px;
+    color:var(--text);font-size:12px;font-weight:700;
+    cursor:pointer;backdrop-filter:blur(8px);transition:background .15s;
+  }
+  .video-toggle-btn:hover{background:rgba(22,25,33,.97)}
+
+  /* Status pill */
+  .status-pill{
+    position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:9px;
+    background:rgba(13,15,20,.82);backdrop-filter:blur(8px);
+    border:1px solid var(--border);border-radius:100px;padding:7px 18px;
+    font-size:13px;font-weight:600;pointer-events:none;
+  }
+  .sdot{width:10px;height:10px;border-radius:50%;transition:background .3s}
+  .sdot.good{background:var(--good);box-shadow:0 0 8px var(--good)}
+  .sdot.bad{background:var(--bad);box-shadow:0 0 8px var(--bad);animation:pulse 1s infinite}
+  .sdot.unknown{background:var(--muted)}
+  .sdot.noperson{background:var(--warn);animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* Alert overlay */
+  .alert-ov{
+    position:absolute;inset:0;border:3px solid transparent;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .3s;z-index:5;
+  }
+  .alert-ov.vis{
+    opacity:1;pointer-events:auto;border-color:var(--bad);
+    background:rgba(239,68,68,.06);animation:bpulse 1.8s infinite;
+  }
+  @keyframes bpulse{
+    0%,100%{border-color:var(--bad);box-shadow:inset 0 0 30px rgba(239,68,68,.08)}
+    50%{border-color:#ff7070;box-shadow:inset 0 0 60px rgba(239,68,68,.2)}
+  }
+  .alert-card{
+    background:rgba(13,15,20,.92);backdrop-filter:blur(14px);
+    border:2px solid var(--bad);border-radius:16px;padding:26px 34px;
+    text-align:center;max-width:340px;
+  }
+  .alert-icon{font-size:38px;margin-bottom:10px}
+  .alert-title{font-size:19px;font-weight:700;color:var(--bad);margin-bottom:7px}
+  .alert-body{font-size:13px;color:var(--muted);line-height:1.6}
+  .alert-tips{margin-top:12px;text-align:left;background:rgba(239,68,68,.07);
+              border-radius:8px;padding:11px 13px}
+  .alert-tips p{font-size:12px;color:var(--muted);margin-bottom:4px;
+                padding-left:14px;position:relative}
+  .alert-tips p::before{content:'→';position:absolute;left:0;color:var(--bad)}
+  .alert-tips p:last-child{margin-bottom:0}
+
+  /* No-person banner */
+  .noperson-ov{
+    position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+    background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);
+    border-radius:10px;padding:10px 18px;font-size:13px;color:var(--warn);
+    display:none;white-space:nowrap;
+  }
+
+  /* ── Sidebar ─────────────────────────────────────────────── */
+  .sidebar{background:var(--surface);border-left:1px solid var(--border);
+           overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:14px}
+  .widget{background:var(--surface2);border:1px solid var(--border);
+          border-radius:10px;padding:15px}
+  .wtitle{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;
+          color:var(--accent);margin-bottom:12px}
+
+  /* Progress bar */
+  .prog-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:6px 0 4px}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));
+             border-radius:3px;transition:width 1s linear}
+
+  /* Message / instruction box */
+  .instruction{background:rgba(79,142,247,.07);border:1px solid rgba(79,142,247,.2);
+               border-radius:8px;padding:13px 15px;font-size:13px;color:var(--muted);
+               line-height:1.7}
+  .instruction strong{color:var(--text)}
+  .instruction ul{padding-left:16px;margin-top:6px}
+  .instruction ul li{margin-bottom:4px}
+
+  /* Alert history */
+  .hist-list{max-height:200px;overflow-y:auto}
+  .hist-item{display:flex;align-items:center;gap:9px;padding:7px 0;
+             border-bottom:1px solid var(--border);font-size:12px}
+  .hist-item:last-child{border-bottom:none}
+  .hdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  .hdot-ok{background:var(--good)}
+  .hdot-ign{background:var(--bad)}
+  .hlat{margin-left:auto;color:var(--muted);font-size:11px}
+</style>
+</head>
+<body>
+
+<!-- Header — no condition badge, no study-design info exposed -->
+<header class="hdr">
+  <span class="hdr-logo">🧍 PostureAware</span>
+  <span class="hdr-pid">{{ session.participant_id }}</span>
+  <div class="spacer"></div>
+  <span class="timer-lbl">SESSION&nbsp;</span>
+  <span class="timer" id="timerEl">00:00</span>
+  <button class="end-btn" onclick="endSession()">End Session</button>
+</header>
+
+<div class="main">
+
+  <!-- Camera panel -->
+  <div class="cam">
+    <!-- <button class="video-toggle-btn" id="videoToggleBtn" onclick="toggleVideo()">
+      Hide Video
+    </button> -->
+
+    <img class="cam-feed" id="camFeed"
+         src="/video_feed/monitor/{{ session_id }}"
+         onerror="document.getElementById('camErr').style.display='block'">
+
+    <!-- Status pill (good / bad / not detected) -->
+    <div class="status-pill">
+      <div class="sdot unknown" id="sdot"></div>
+      <span id="stxt">Detecting…</span>
+    </div>
+
+    <!-- Posture alert overlay -->
+    <div class="alert-ov" id="alertOv">
+      <div class="alert-card">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-title">Poor Posture Detected</div>
+        <div class="alert-body">Poor posture detected. Please correct your sitting position.</div>
+        <div class="alert-tips">
+          <p id="tip-neck">Lift your head — chin parallel to floor</p>
+          <p id="tip-sh">Level your shoulders, relax them down</p>
+          <p id="tip-prox">Move back to arm's-length from screen</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Out-of-frame banner -->
+    <div class="noperson-ov" id="nopersonBanner">
+      📷 We can't see you — please return to your seat
+    </div>
+
+    <div id="camErr"
+         style="display:none;position:absolute;color:var(--muted);text-align:center;padding:20px">
+      📷 Camera not accessible. Check browser permissions.
+    </div>
+  </div>
+
+  <!-- Sidebar: only progress + message + history -->
+  <aside class="sidebar">
+
+    <!-- Study progress -->
+    <div class="widget">
+      <div class="wtitle">Study Progress</div>
+      <div class="prog-bg">
+        <div class="prog-fill" id="progFill" style="width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">
+        <span id="progPct">0%</span>
+        <span>30 min</span>
+      </div>
+    </div>
+
+    <!-- Instructions for participant -->
+    <div class="widget">
+      <div class="wtitle">Session Guide</div>
+      <div class="instruction">
+        <strong>Study session is active ✅</strong>
+        <ul>
+          <li>If you can see the video feed, the system is working.</li>
+          <li>Switch to another browser tab and do your usual work!</li>
+          <li>An audio chime + red overlay will appear that alerts for detrimental posture.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Alert history -->
+    <div class="widget">
+      <div class="wtitle">Alert History</div>
+      <div class="hist-list" id="histList">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:10px 0">
+          No alerts yet
+        </div>
+      </div>
+    </div>
+
+  </aside>
+</div>
+
+<script>
+const SID      = "{{ session_id }}";
+const DURATION = 30 * 60;
+
+let startTime   = Date.now();
+let history     = [];
+let alertActive = false;
+let videoHidden = false;
+
+// ── Video toggle ───────────────────────────────────────────────────────────────
+function toggleVideo() {
+  const feed = document.getElementById('camFeed');
+  const btn  = document.getElementById('videoToggleBtn');
+  videoHidden = !videoHidden;
+
+  if (videoHidden) {
+    // Pause the MJPEG stream by removing the src; saves CPU/bandwidth
+    feed.dataset.src = feed.src;   // stash real URL
+    feed.src = '';
+    feed.classList.add('hidden');
+    btn.textContent = 'Show Video';
+  } else {
+    feed.src = feed.dataset.src;   // restore stream
+    feed.classList.remove('hidden');
+    btn.textContent = 'Hide Video';
+  }
+}
+
+// ── Socket.IO ─────────────────────────────────────────────────────────────────
+const io = window.io();
+io.on('connect', () => io.emit('join_session', { session_id: SID }));
+
+io.on('posture_update', ({ posture, actions }) => {
+  if (posture) updateStatusPill(posture);
+  else         showNoPersonUI();
+  if (actions) handleActions(actions);
+});
+
+// ── Status pill ───────────────────────────────────────────────────────────────
+function updateStatusPill(p) {
+  document.getElementById('nopersonBanner').style.display = 'none';
+  const dot  = document.getElementById('sdot');
+  const stxt = document.getElementById('stxt');
+  dot.className    = 'sdot ' + (p.good ? 'good' : 'bad');
+  stxt.textContent = p.good ? 'Good Posture' : 'Poor Posture';
+
+  // Highlight the specific tips that are active when alert is showing
+  if (!p.good) {
+    document.getElementById('tip-neck').style.color = p.neck_bad  ? 'var(--text)' : 'var(--muted)';
+    document.getElementById('tip-sh').style.color   = p.sh_bad    ? 'var(--text)' : 'var(--muted)';
+    document.getElementById('tip-prox').style.color = p.prox_bad  ? 'var(--text)' : 'var(--muted)';
+  }
+}
+
+function showNoPersonUI() {
+  document.getElementById('sdot').className = 'sdot noperson';
+  document.getElementById('stxt').textContent = 'Not Detected';
+  document.getElementById('nopersonBanner').style.display = 'block';
+}
+
+// ── Alert overlay ─────────────────────────────────────────────────────────────
+function handleActions(a) {
+  if (a.show_alert && !alertActive) {
+    alertActive = true;
+    document.getElementById('alertOv').classList.add('vis');
+  }
+  if (a.hide_alert || a.alert_expired) {
+    alertActive = false;
+    document.getElementById('alertOv').classList.remove('vis');
+    addHistory(a.latency, !!a.alert_expired);
+  }
+}
+
+// ── Alert history ─────────────────────────────────────────────────────────────
+function addHistory(lat, expired) {
+  history.push({ lat, expired });
+  const list = document.getElementById('histList');
+  list.innerHTML = [...history].reverse().slice(0, 15).map((h, i) => {
+    const n    = history.length - i;
+    const cls  = h.expired ? 'hdot hdot-ign' : 'hdot hdot-ok';
+    // const ltxt = h.lat ? h.lat.toFixed(1) + 's' : 'Ignored'; <span class="hlat">${ltxt}</span>
+    return `<div class="hist-item">
+      <div class="${cls}"></div>
+      <span>Alert #${n}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── Session timer ─────────────────────────────────────────────────────────────
+function tick() {
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const mm  = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const ss  = String(elapsed % 60).padStart(2, '0');
+  document.getElementById('timerEl').textContent = `${mm}:${ss}`;
+  const pct = Math.min(100, (elapsed / DURATION) * 100);
+  document.getElementById('progFill').style.width = pct + '%';
+  document.getElementById('progPct').textContent  = Math.round(pct) + '%';
+  if (elapsed >= DURATION) endSession();
+}
+setInterval(tick, 1000);
+tick();
+
+// ── End session ───────────────────────────────────────────────────────────────
+async function endSession() {
+  await fetch(`/api/stop_session/${SID}`, { method: 'POST' });
+  window.location.href = `/questionnaire/${SID}`;
+}
+</script>
+</body>
+</html>

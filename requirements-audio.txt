@@ -1,0 +1,3 @@
+-r requirements.txt
+# Optional: requires PortAudio development libraries on macOS/Linux.
+PyAudio==0.2.14
