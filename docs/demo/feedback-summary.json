@@ -1,0 +1,26 @@
+{
+  "immediate": {
+    "alert_times": [
+      3.0,
+      23.0
+    ],
+    "correction_times": [
+      10.0,
+      30.0
+    ],
+    "final_delay": 5.0,
+    "alerts": 2
+  },
+  "adaptive": {
+    "alert_times": [
+      7.0,
+      27.4
+    ],
+    "correction_times": [
+      10.0,
+      30.0
+    ],
+    "final_delay": 5.7,
+    "alerts": 2
+  }
+}

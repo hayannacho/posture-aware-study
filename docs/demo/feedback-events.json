@@ -1,0 +1,50 @@
+[
+  {
+    "condition": "immediate",
+    "seconds": 3.0,
+    "action": "show_alert",
+    "adaptive_delay": 5.0
+  },
+  {
+    "condition": "immediate",
+    "seconds": 10.0,
+    "action": "hide_alert",
+    "adaptive_delay": 5.0
+  },
+  {
+    "condition": "immediate",
+    "seconds": 23.0,
+    "action": "show_alert",
+    "adaptive_delay": 5.0
+  },
+  {
+    "condition": "immediate",
+    "seconds": 30.0,
+    "action": "hide_alert",
+    "adaptive_delay": 5.0
+  },
+  {
+    "condition": "adaptive",
+    "seconds": 7.0,
+    "action": "show_alert",
+    "adaptive_delay": 5.0
+  },
+  {
+    "condition": "adaptive",
+    "seconds": 10.0,
+    "action": "hide_alert",
+    "adaptive_delay": 5.3
+  },
+  {
+    "condition": "adaptive",
+    "seconds": 27.4,
+    "action": "show_alert",
+    "adaptive_delay": 5.3
+  },
+  {
+    "condition": "adaptive",
+    "seconds": 30.0,
+    "action": "hide_alert",
+    "adaptive_delay": 5.7
+  }
+]

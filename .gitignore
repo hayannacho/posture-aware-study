@@ -26,3 +26,9 @@ __pycache__/
 .pytest_cache/
 .DS_Store
 *.log
+
+# Generated local demos; reviewed synthetic artifacts below are public fixtures.
+output/
+!docs/demo/feedback-trace.csv
+!docs/demo/feedback-events.json
+!docs/demo/feedback-summary.json

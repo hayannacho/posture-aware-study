@@ -1,27 +1,40 @@
 # PostureAware
 
-**A webcam application for exploring immediate versus adaptive sitting-posture feedback.**
+**A local webcam application for comparing immediate and adaptive posture feedback.**
 
-MediaPipe pose estimation, personal calibration, visual monitoring and optional audio cues come together in a local Flask application. Developed as a team project for Georgia Tech's Health Sensing and Interventions course. AI tools were used to help write application code; see [code-development disclosure](AI_USAGE.md).
+Calibrate a personal baseline, monitor upper-body posture, provide visual and optional audio cues, and summarize a session. A team project for Georgia Tech's Health Sensing and Interventions course. Application code was developed with AI assistance; see [the code-development disclosure](AI_USAGE.md).
 
-## Features and demo outputs
+[Run locally](#run-locally) · [Synthetic feedback demo](#see-the-feedback-logic) · [Validation](docs/VALIDATION.md)
 
-| Step | What the application does |
-| --- | --- |
-| Calibrate | Check lighting and estimate a personal neutral-posture baseline |
-| Monitor | Track neck tilt, shoulder tilt and face proximity |
-| Give feedback | Use a 1-second poor-posture threshold for immediate feedback; adaptive feedback starts at 5 seconds and changes with correction latency |
-| Summarize | Produce session summaries and a post-session questionnaire |
+## See the feedback logic
 
-**Verified:** four hardware-free tests passed, covering baseline calibration, synthetic lighting, Flask registration/pages and temporary synthetic record creation. Live camera tracking, audio and 30-minute sessions have not been revalidated. [Validation details](docs/VALIDATION.md).
+![Actual feedback state-machine output from two scripted poor-posture intervals](docs/assets/feedback-timing.png)
 
-**Study context:** the study report describes a 13-person study with 30-minute sessions. No efficacy result is claimed from this data-free edition. This is a course research prototype, not a clinically validated system.
+The same synthetic posture sequence is passed to the application's actual feedback function. Poor-posture intervals start at 2s and 22s; scripted corrections occur at 10s and 30s. Colored bars show when an alert is active.
 
-**Participant data excluded:** no original participant records, questionnaires, logs or recordings are published. Running the app can create new local records; see [data handling](docs/DATA_HANDLING.md).
+| Mode | First alert | Second alert | What changes |
+|---|---:|---:|---|
+| Immediate | 3.0s | 23.0s | 1-second poor-posture threshold; the inter-alert gap rule also applies |
+| Adaptive | 7.0s | 27.4s | Delay updates from 5.00 → 5.30 → 5.70 seconds after scripted corrections |
+
+These are **software behavior results from generated inputs**, not participant measurements or evidence of intervention efficacy. The 10 Hz input schedule and floating-point threshold comparison affect exact alert times. [Trace CSV](docs/demo/feedback-trace.csv) · [Event log](docs/demo/feedback-events.json) · [Run summary](docs/demo/feedback-summary.json).
+
+## Application flow
+
+**Register → calibrate → monitor → receive feedback → review a session summary.**
+
+| Stage | Function |
+|---|---|
+| Calibrate | Check lighting and estimate a neutral-posture baseline |
+| Monitor | Track neck tilt, shoulder tilt, and face proximity with MediaPipe |
+| Respond | Show posture cues; optionally play audio; update adaptive delay from correction latency |
+| Summarize | Save local session summaries and questionnaire responses |
+
+**Verified:** four hardware-free tests passed, plus the new feedback demo's timing, correction, and delay checks. Camera tracking, audible feedback, and complete 30-minute sessions were not revalidated. The original study involved 13 participants; no participant records or study outcome figures are distributed here.
 
 ## Run locally
 
-Use **Python 3.11 or 3.12**. Validation details are recorded in [VALIDATION.md](docs/VALIDATION.md).
+Use **Python 3.11 or 3.12**; the tested environment is Python 3.12 on macOS ARM64.
 
 ```bash
 python3 -m venv .venv
@@ -31,50 +44,40 @@ python -m pip install -r requirements.txt
 python app.py
 ```
 
-Open `http://127.0.0.1:5000` on the same computer. The camera and audio are attached to the Python process on that computer. Run one local user session at a time; the inherited global camera/pose/session design is not a multi-user service.
+Open `http://127.0.0.1:5000` on the computer running Python. The camera and audio belong to that computer. Use one local session at a time; the app has shared camera, pose, and session state.
 
-**Audio is optional for installation, but required to evaluate the study's audible feedback.** Without PyAudio, the app runs silently with an explicit warning. See [SETUP.md](SETUP.md) for audio installation. Do not interpret a silent demo as a reproduction of the original intervention.
+Audio installation is documented in [SETUP.md](SETUP.md). Without PyAudio, the app runs silently with a warning; audible feedback requires the optional audio dependencies. The monitor page loads Socket.IO JavaScript from a CDN. Pose processing and study-session files remain local; this edition is not entirely offline.
 
-The core application performs pose processing locally and writes records under `data/`. The monitor page loads Socket.IO JavaScript from a CDN, so this edition is not entirely offline. It is not configured to upload study records to an analytics service.
+### Reproduce the synthetic figure
 
-## Checks
+```bash
+python -m pip install -r requirements-viz.txt
+python examples/feedback_demo.py
+```
+
+Outputs go to `output/feedback-demo/`. The script blocks camera opening, suppresses audio calls, supplies generated good/poor classifications, and exercises the unchanged feedback state machine. It does not test pose classification or write participant session files. MediaPipe initialization still requires a supported graphics environment.
+
+### Run the checks
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python -m pytest -q
-python -m pip check
 ```
 
-The tests do not open a camera, play audio, or load participant data. They cover baseline behavior, synthetic lighting, Flask page/registration smoke checks, and temporary-directory record creation. Live tracking accuracy, audio hardware, and real-session behavior require separate manual verification.
+The tests cover baseline calibration, synthetic lighting, Flask registration/pages, and temporary synthetic record creation. [Validation](docs/VALIDATION.md) records the MediaPipe wheel-metadata caveat and dependency warnings.
 
-## Development and source
+## Data and source
 
-The application integrates personal-baseline calibration, posture monitoring, feedback timing and local study-session records. AI tools were used to help generate application code. [Code-development disclosure](AI_USAGE.md) · [Source and changes](docs/PROVENANCE.md).
+Original participant records, questionnaires, logs, recordings, and the study report are excluded. The only distributed trace is generated by the synthetic feedback demo. Running the app can create new local records under `data/`; keep them private. [Data handling](docs/DATA_HANDLING.md).
 
-## Participant data excluded
+| Path | Purpose |
+|---|---|
+| `app.py` | Flask/Socket.IO app, pose metrics, feedback state machine |
+| `calibration.py` / `audio_alerts.py` | Baseline calibration and optional generated chimes |
+| `templates/` | Local registration, calibration, monitor, survey, and results pages |
+| `examples/feedback_demo.py` | Hardware-free synthetic feedback visualization |
+| `tests/` / `docs/` | Checks, source records, validation, and data boundaries |
 
-No original questionnaire responses, participant IDs/rows, alert logs, session summaries, or recordings are included. Tests create clearly labeled synthetic records only in temporary directories. Running the application yourself can create new local records; `.gitignore` excludes these, but is not an anonymization mechanism.
+[Source and changes](docs/PROVENANCE.md) retain upstream provenance and distinguish the original application from later packaging, local server defaults, checks, and the synthetic visualization. The archived app does not contain the analysis/export scripts referenced in its old setup guide, so this edition does not reproduce the original study statistics.
 
-Do not add original participant folders, `data/`, exports, screenshots of individual records, or original Git history to a public copy. See [the data-handling notes](docs/DATA_HANDLING.md).
-
-## Files
-
-```text
-app.py                 Local Flask/Socket.IO app and study logic
-calibration.py         Lighting and personal-baseline calibration
-audio_alerts.py        Optional generated chimes
-templates/             Registration, calibration, monitor, survey, results
-requirements*.txt      Core, optional audio, and test dependencies
-tests/                 New hardware-free preparation checks
-docs/                  Contribution, provenance, data handling, validation
-```
-
-Original setup scripts that repeatedly installed conflicting OpenCV packages are omitted. The old setup guide referenced `analyze_results.py` and `export_data.py`, which are absent from the supplied app snapshot; this edition does not advertise those commands or claim to reproduce the original study statistics.
-
-## Source and licensing
-
-The upstream recorded in the archive is [amey-agarwal/CorrectivePosture](https://github.com/amey-agarwal/CorrectivePosture). The available history ends at `67a8a88`. This is a curated snapshot, not a preserved-history fork. Source provenance is retained in the documentation.
-
-**No license file was found in the supplied app snapshot.** No new open-source license is assigned here. The repository does not grant additional redistribution rights. See [NOTICE.md](NOTICE.md).
-
-Portfolio preparation added these documents, dependency cleanup, hardware-free checks, and local server defaults: loopback-only binding, debug disabled, a runtime secret key, and default same-origin Socket.IO handling. These are publication-preparation changes, not claims about the original coursework implementation. [Source manifest and changes](docs/PROVENANCE.md).
+No license file was present in the supplied source snapshot, and no additional redistribution rights are granted. [NOTICE](NOTICE.md).

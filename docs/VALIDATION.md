@@ -1,5 +1,15 @@
 # Validation — 2026-11-13
 
+## Synthetic feedback visualization — 2026-11-17
+
+The existing suite passed **4 tests**, retaining three dependency warnings, on Python 3.12.14. `examples/feedback_demo.py` additionally exercises the unchanged `_process_posture` function with the same 351 generated classifications per condition (10 Hz, 0–35 seconds). It blocks `cv2.VideoCapture` and replaces audio calls with mocks. No camera, participant records, or session-file save functions are used. MediaPipe initialization still occurs; pose classification itself is not evaluated.
+
+Two poor-posture intervals start at 2s and 22s; scripted corrections occur at 10s and 30s. Immediate alerts occur at 3s and 23s; adaptive alerts at 7s and 27.4s. Both modes clear on both corrections and report two alerts with no ignored alerts. Adaptive delay changes 5.00 → 5.30 → 5.70 seconds. Assertions check the first thresholds, both corrections, alert counts, and final delay.
+
+Inputs are evaluated with timestamps 1000 + elapsed seconds. At the second adaptive threshold, binary floating-point subtraction leaves the 27.3s sample just below 5.3 seconds; the next 0.1s sample triggers the alert. This observed behavior is preserved, not smoothed in the figure. Corrections are scripted inputs, not human response measurements.
+
+Matplotlib 3.11.2 renders the inspected PNG. [Trace](demo/feedback-trace.csv), [events](demo/feedback-events.json), and [summary](demo/feedback-summary.json) contain only generated behavior. The plot does not establish pose accuracy, audible feedback, efficacy, or real-browser streaming behavior.
+
 Environment: macOS 26.2 arm64, Python 3.12, a new temporary virtual environment.
 
 | Check | Observed result |
